@@ -10,7 +10,7 @@ import UIKit
 import CoreLocation
 import SwiftLocation
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, OpenWeatherMapDelegate, CLLocationManagerDelegate {
+class ViewController: UIViewController,  UITableViewDelegate, OpenWeatherMapDelegate, CLLocationManagerDelegate {
     
     var openWeather = OpenWeatherMap()
     let locationManager: CLLocationManager = CLLocationManager()
@@ -21,17 +21,14 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     var refreshControl : UIRefreshControl!
     
     @IBOutlet weak var tableView: UITableView!
-    @IBOutlet weak var viewMore: UIView!
-    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-    
     
     
     func refresh(sender:AnyObject) {
         refreshBegin("Refresh",
             refreshEnd: {(x:Int) -> () in
                 self.getLocation()
+                self.rows = []
                 self.tableView.reloadData()
-                //self.refreshControl.endRefreshing()
         })
     }
     
@@ -51,7 +48,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         self.openWeather.delegate = self
-        //self.openWeather.weatherFor("")
+        //tableView.registerClass(CustomTableViewCell.self, forCellReuseIdentifier: "cellIdent") //Nib(UINib(nibName: "CustomTableViewCell", bundle: nil), forCellReuseIdentifier: "cellIdent")
         
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
@@ -62,7 +59,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         refreshControl.attributedTitle = NSAttributedString(string: "Refreshing...")
         refreshControl.addTarget(self, action: "refresh:", forControlEvents: UIControlEvents.ValueChanged)
         tableView.addSubview(refreshControl)
-        
     }
     
     func getLocation() {
@@ -93,8 +89,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        var cell = tableView.dequeueReusableCellWithIdentifier("cellIdent", forIndexPath: indexPath) as! UITableViewCell
-        cell.textLabel?.text = rows[indexPath.item].time
+        var cell = tableView.dequeueReusableCellWithIdentifier("cellIdent", forIndexPath: indexPath) as! CustomTableViewCell
+        //cell.textLabel?.text = rows[indexPath.item].time
+        cell.cellText.text = rows[indexPath.item].time
+        cell.tempMinLabel.text = "Min: \(rows[indexPath.item].tempMin)"
+        cell.tempMaxLabel.text = "Max: \(rows[indexPath.item].tempMax)"
         self.refreshControl.endRefreshing()
         return cell
     }
@@ -102,7 +101,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         //click on cell
         println(indexPath.item)
         performSegueWithIdentifier("toDetail", sender: indexPath.item)
-        
     }
     
     func updateWeatherInfo(weatherJson: AnyObject) {

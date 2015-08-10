@@ -26,12 +26,6 @@ class OpenWeatherMap {
     
     var delegate: OpenWeatherMapDelegate!
     
-    func weatherFor(city: String) {
-        
-        let params = ["q" : city]
-        setRequest(params)
-        
-    }
 
     func weatherFor(geo: CLLocationCoordinate2D) {
         let params = ["lat" : geo.latitude, "lon" : geo.longitude]
@@ -63,16 +57,6 @@ class OpenWeatherMap {
         return dateFormatter.stringFromDate(weatherDate)
     }
     
-    func convertTemperature(country: String, temperature: Double) -> Double {
-        
-        if (country == "US") {
-            //Convert to F
-            return (round(((temperature - 273.15) * 1.8) + 32))
-        } else {
-            //Convert to C
-            return (round(temperature - 273.15))
-        }
-    }
 }
 
 
